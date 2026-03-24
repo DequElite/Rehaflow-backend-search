@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package search;
+
+option java_package = "rehaflow.search_service.grpc";
+option java_multiple_files = true;
+
+message SearchRequest {
+  string index = 1;
+  string query = 2;
+
+  map<string, string> filters = 3;
+}
+
+message SearchResponse {
+  int64 total = 1;
+  repeated string ids = 2;
+}
+
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResponse);
+}
