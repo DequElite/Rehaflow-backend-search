@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class DoctorDocument {
     @Id
-    private UUID id;
+    private UUID baseId;
 
     @Field(type = FieldType.Text)
     private String fullName;
@@ -29,9 +29,6 @@ public class DoctorDocument {
 
     @Field(type = FieldType.Text)
     private String specialization;
-
-    @Field(type = FieldType.Keyword)
-    private String baseId;
 
     @Field(type = FieldType.Keyword)
     private String hospitalId;

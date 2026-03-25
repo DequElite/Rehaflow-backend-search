@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProtocolDocument {
     @Id
-    private UUID id;
+    private UUID baseId;
 
     @Field(type = FieldType.Keyword)
     private String type;
@@ -58,7 +58,4 @@ public class ProtocolDocument {
 
     @Field(type = FieldType.Keyword)
     private String hospitalId;
-
-    @Field(type = FieldType.Keyword)
-    private String baseId;
 }

@@ -30,6 +30,6 @@ public class IndexDocumentService {
         Document document = Document.create();
         document.putAll(request.getDataMap());
 
-        elasticsearchOperations.save(document, request.getIndex());
+        elasticsearchOperations.save(document, request.getIndex(), request.getDataMap().get("baseId"));
     }
 }
