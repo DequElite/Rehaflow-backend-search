@@ -33,3 +33,4 @@ public class DoctorDocument {
     @Field(type = FieldType.Keyword)
     private String hospitalId;
 }
+

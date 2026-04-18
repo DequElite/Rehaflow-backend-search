@@ -3,12 +3,14 @@ package rehaflow.search_service.app.index;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 import rehaflow.search_service.grpc.IndexDocumentRequest;
 import rehaflow.search_service.grpc.IndexDocumentResponse;
 import rehaflow.search_service.grpc.IndexDocumentServiceGrpc;
 
 @GrpcService
+@Slf4j
 @RequiredArgsConstructor
 public class IndexDocumentController extends IndexDocumentServiceGrpc.IndexDocumentServiceImplBase {
     private final IndexDocumentService service;
@@ -29,6 +31,8 @@ public class IndexDocumentController extends IndexDocumentServiceGrpc.IndexDocum
             responseObserver.onCompleted();
         } catch (IllegalArgumentException e) {
 
+            log.error("INDEX DOCUMENT CRASH ", e);
+
             responseObserver.onError(
                     Status.INVALID_ARGUMENT
                             .withDescription(e.getMessage())
@@ -36,6 +40,8 @@ public class IndexDocumentController extends IndexDocumentServiceGrpc.IndexDocum
             );
 
         } catch (Exception e) {
+
+            log.error("INDEX DOCUMENT CRASH ", e);
 
             responseObserver.onError(
                     Status.INTERNAL
