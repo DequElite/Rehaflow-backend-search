@@ -3,6 +3,7 @@ package rehaflow.search_service.app.search;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
@@ -16,6 +17,7 @@ import rehaflow.search_service.grpc.SearchResponse;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SearchService {
@@ -29,17 +31,19 @@ public class SearchService {
 
         IndexOperations indexOperations =
                 elasticsearchOperations.indexOps(IndexMapping.INDEX_TO_CLASS.get(request.getIndex()));
-        if(!indexOperations.exists()) {
+
+        if (!indexOperations.exists()) {
             throw new RuntimeException("Index not found");
         }
 
-        Query mainQuery = Query.of(
-                q ->
-                        q.multiMatch(mm -> mm
-                            .query(request.getQuery())
-                            .fields("*")
-                            .fuzziness("AUTO")
-                        )
+        List<String> searchFields = IndexMapping.INDEX_TO_SEARCH_FIELDS.get(request.getIndex());
+
+        Query mainQuery = Query.of(q -> q
+                .multiMatch(mm -> mm
+                        .query(request.getQuery())
+                        .fields(searchFields)
+                        .fuzziness("AUTO")
+                )
         );
 
         List<Query> filters = request.getFiltersMap().entrySet().stream()
@@ -57,20 +61,22 @@ public class SearchService {
 
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(query)
-                .withFields("base_id")
                 .build();
 
-        SearchHits<?> searchHits =
-                elasticsearchOperations.search(nativeQuery, IndexMapping.INDEX_TO_CLASS.get(request.getIndex()));
+        SearchHits<?> searchHits = elasticsearchOperations.search(
+                nativeQuery,
+                IndexMapping.INDEX_TO_CLASS.get(request.getIndex())
+        );
 
-        List<String> result = searchHits.stream()
-                .map(SearchHit::getContent)
-                .map(Object::toString)
+        log.info("Search hits count: {}", searchHits.getTotalHits());
+
+        List<String> ids = searchHits.stream()
+                .map(SearchHit::getId)
                 .toList();
 
         return SearchResponse.newBuilder()
                 .setTotal(searchHits.getTotalHits())
-                .addAllIds(result)
+                .addAllIds(ids)
                 .build();
     }
 }
