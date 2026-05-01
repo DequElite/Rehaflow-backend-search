@@ -26,8 +26,5 @@ public class DoctorPatientDocument {
     private LocalDate birthdate;
 
     @Field(type = FieldType.Keyword)
-    private String gender;
-
-    @Field(type = FieldType.Keyword)
     private String doctorId;
 }
